@@ -11,6 +11,7 @@ A full-stack web application for monitoring and analyzing air, water, soil, and 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk)](https://www.java.com/)
 [![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite)](https://www.sqlite.org/)
+[![Team](https://img.shields.io/badge/Team-ByteBreath-00C896?style=for-the-badge&logo=github)](https://github.com/rahativity/EcoEarth)
 
 </div>
 
@@ -221,6 +222,24 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
+## 👥 Team
+
 <div align="center">
-  Made with 💚 for a cleaner planet
+
+### 🌿 ByteBreath
+
+*Building tech for a cleaner tomorrow*
+
+| # | Name | Role |
+|---|------|------|
+| 1 | **Md. Redwan Hossain** | Team Member |
+| 2 | **Sabiha Rumman Medha** | Team Member |
+| 3 | **Md. Sabbir Hossain Rahat** | Team Member |
+
+</div>
+
+---
+
+<div align="center">
+  Made with 💚 by <strong>Team ByteBreath</strong> — for a cleaner planet
 </div>
