@@ -33,7 +33,7 @@ The dashboard surfaces critical zones (most polluted cities) and safe havens (cl
 
 ## ✨ Features
 
-- 🌐 **Global Pollution Overview** — Tracks 30+ cities with live summary statistics
+- 🌐 **Global Pollution Overview** — Tracks 100+ cities with live summary statistics
 - 📈 **Interactive Charts** — Visualizations powered by Recharts
 - 🎨 **Animated UI** — Smooth page transitions and micro-animations via Framer Motion
 - 🌙 **Dark / Light Mode** — Full theme support
