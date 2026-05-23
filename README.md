@@ -232,9 +232,9 @@ This project is open source and available under the [MIT License](LICENSE).
 
 | # | Name | Role |
 |---|------|------|
-| 1 | **Md. Redwan Hossain** | Team Member |
-| 2 | **Sabiha Rumman Medha** | Team Member |
-| 3 | **Md. Sabbir Hossain Rahat** | Team Member |
+| 1 | **Md. Redwan Hossain** | 🎨 Frontend Developer & UI Designer |
+| 2 | **Sabiha Rumman Medha** | 🖥️ Frontend Developer & Presentation Designer |
+| 3 | **Md. Sabbir Hossain Rahat** | ⚙️ Backend Developer |
 
 </div>
 
