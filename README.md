@@ -125,6 +125,9 @@ git clone https://github.com/rahativity/EcoEarth.git
 cd EcoEarth
 ```
 
+> [!TIP]
+> Alternatively, you can download the full pre-configured project (including `node_modules`) directly from [Google Drive](https://drive.google.com/drive/folders/1HeTygFHxe7mLUOty1Yv95I8yLGDx3ohn?usp=sharing).
+
 ---
 
 ### 2. Run the Backend
@@ -232,8 +235,8 @@ This project is open source and available under the [MIT License](LICENSE).
 
 | # | Name | Role |
 |---|------|------|
-| 1 | **Md. Redwan Hossain** | 🎨 Frontend Developer & Presentation Designer |
-| 2 | **Sabiha Rumman Medha** | 🖥️ Frontend Developer & UI Designer |
+| 1 | **Md. Redwan Hossain** | 🎨 Frontend Developer & UI Designer |
+| 2 | **Sabiha Rumman Medha** | 🖥️ Frontend Developer & Presentation Designer |
 | 3 | **Md. Sabbir Hossain Rahat** | ⚙️ Backend Developer |
 
 </div>
