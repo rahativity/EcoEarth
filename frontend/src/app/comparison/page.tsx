@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import api from '@/lib/api';
 import { BarChart2, ShieldCheck, ArrowRightLeft, TrendingDown, Wind, Droplets, MountainSnow, Volume2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,14 +37,7 @@ function ComparisonContent() {
   const [data, setData] = useState<any>(null);
   const { t, formatNumber, tApi, language } = useLanguage();
 
-  // Reset comparison data if query type changes but retain selected cities
-  useEffect(() => {
-    if (city1 && city2) {
-      handleCompare();
-    }
-  }, [type]);
-
-  const handleCompare = async () => {
+  const handleCompare = useCallback(async () => {
     if (!city1 || !city2) return;
     if (city1 === city2) {
       setError(t('errors.selectDifferent'));
@@ -67,7 +60,14 @@ function ComparisonContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [city1, city2, t]);
+
+  // Reset comparison data if query type changes but retain selected cities
+  useEffect(() => {
+    if (city1 && city2) {
+      handleCompare();
+    }
+  }, [type, city1, city2, handleCompare]);
 
   const handleSwap = () => {
     const temp = city1;
