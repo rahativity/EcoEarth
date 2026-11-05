@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import api from '@/lib/api';
-import { BarChart2, ShieldCheck, ArrowRightLeft, AlertCircle, TrendingDown, Wind, Droplets, MountainSnow, Volume2 } from 'lucide-react';
+import { BarChart2, ShieldCheck, ArrowRightLeft, TrendingDown, Wind, Droplets, MountainSnow, Volume2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CitySelect from '@/components/CitySelect';
 import { useCities } from '@/lib/useCities';
 import { useLanguage } from '@/components/LanguageProvider';
 import { useSearchParams } from 'next/navigation';
+import PageHeader from '@/components/PageHeader';
+import { ErrorPanel, LoadingPanel, EmptyPanel } from '@/components/StatePanel';
 import {
   Radar,
   RadarChart,
@@ -35,14 +37,7 @@ function ComparisonContent() {
   const [data, setData] = useState<any>(null);
   const { t, formatNumber, tApi, language } = useLanguage();
 
-  // Reset comparison data if query type changes but retain selected cities
-  useEffect(() => {
-    if (city1 && city2) {
-      handleCompare();
-    }
-  }, [type]);
-
-  const handleCompare = async () => {
+  const handleCompare = useCallback(async () => {
     if (!city1 || !city2) return;
     if (city1 === city2) {
       setError(t('errors.selectDifferent'));
@@ -65,7 +60,14 @@ function ComparisonContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [city1, city2, t]);
+
+  // Reset comparison data if query type changes but retain selected cities
+  useEffect(() => {
+    if (city1 && city2) {
+      handleCompare();
+    }
+  }, [type, city1, city2, handleCompare]);
 
   const handleSwap = () => {
     const temp = city1;
@@ -189,17 +191,17 @@ function ComparisonContent() {
   };
 
   const getPageHeaderIcon = () => {
-    if (type === 'water') return <Droplets className="mr-3 text-blue-500 w-10 h-10" />;
-    if (type === 'soil') return <MountainSnow className="mr-3 text-amber-500 w-10 h-10" />;
-    if (type === 'sound') return <Volume2 className="mr-3 text-emerald-500 w-10 h-10" />;
-    return <Wind className="mr-3 text-sky-400 w-10 h-10" />;
+    if (type === 'water') return Droplets;
+    if (type === 'soil') return MountainSnow;
+    if (type === 'sound') return Volume2;
+    return Wind;
   };
 
-  const getPageHeaderGradient = () => {
-    if (type === 'water') return 'from-blue-400 to-indigo-500';
-    if (type === 'soil') return 'from-amber-400 to-orange-500';
-    if (type === 'sound') return 'from-emerald-400 to-teal-500';
-    return 'from-sky-400 to-blue-500';
+  const getPageHeaderTone = () => {
+    if (type === 'water') return 'text-blue-500';
+    if (type === 'soil') return 'text-amber-500';
+    if (type === 'sound') return 'text-emerald-500';
+    return 'text-sky-500';
   };
 
   const getActiveSectorName = () => {
@@ -229,25 +231,17 @@ function ComparisonContent() {
   };
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto pb-12">
-      
-      {/* Dynamic Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <div className="flex items-center">
-          {getPageHeaderIcon()}
-          <h1 className={`text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r ${getPageHeaderGradient()} tracking-tight`}>
-            {t('comparison_menu.title')} &mdash; {getActiveSectorName()}
-          </h1>
-        </div>
-        <p className="text-lg text-muted-foreground mt-3">{t('comparison.subtitle')}</p>
-      </motion.div>
+    <div className="page-shell">
+      <PageHeader
+        title={`${t('comparison_menu.title')} — ${getActiveSectorName()}`}
+        subtitle={t('comparison.subtitle')}
+        icon={getPageHeaderIcon()}
+        iconTone={getPageHeaderTone()}
+        badge="Comparison Module"
+      />
 
       {/* Selectors */}
-      <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-center">
+      <div className="card grid grid-cols-1 md:grid-cols-7 gap-4 items-center">
         <div className="md:col-span-3">
           <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">{t('comparison.city1Label')}</label>
           <CitySelect
@@ -288,36 +282,21 @@ function ComparisonContent() {
         <button
           onClick={handleCompare}
           disabled={!city1 || !city2 || loading}
-          className="px-8 py-3.5 rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2 focus:outline-none"
+          className="action-button-primary min-w-[190px]"
         >
           {loading ? t('buttons.comparing') : t('buttons.compare')}
         </button>
       </div>
 
-      {loading && (
-        <div className="flex justify-center py-12">
-          <svg className="animate-spin h-10 w-10 text-teal-500" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </div>
-      )}
+      {loading && <LoadingPanel message={t('buttons.comparing')} />}
 
       <AnimatePresence>
-        {error && !loading && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-6 py-4 rounded-xl flex items-center">
-              <AlertCircle className="w-5 h-5 mr-3 shrink-0" />
-              {error}
-            </div>
-          </motion.div>
-        )}
+        {error && !loading && <ErrorPanel message={error} />}
       </AnimatePresence>
+
+      {!loading && !error && !data && city1 && city2 ? (
+        <EmptyPanel title="No comparison data available" description="Try different cities or try again in a moment." />
+      ) : null}
 
       <AnimatePresence>
         {data && !loading && (
@@ -646,11 +625,8 @@ function ComparisonContent() {
 export default function ComparisonPage() {
   return (
     <Suspense fallback={
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <svg className="animate-spin h-10 w-10 text-teal-500" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
+      <div className="page-shell">
+        <LoadingPanel message="Loading comparison module…" />
       </div>
     }>
       <ComparisonContent />

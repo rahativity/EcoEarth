@@ -1,11 +1,8 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import Navbar from '@/components/Navbar';
 import ThemeProvider from '@/components/ThemeProvider';
 import { LanguageProvider } from '@/components/LanguageProvider';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Eco Earth – Modern Environmental Dashboard',
@@ -20,12 +17,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body>
         <ThemeProvider>
           <LanguageProvider>
-            <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
+            <div className="min-h-screen flex flex-col text-foreground">
               <Navbar />
-              <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
                 {children}
               </main>
             </div>
