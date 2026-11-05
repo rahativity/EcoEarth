@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import api from '@/lib/api';
-import { MountainSnow, AlertCircle, Sprout, ShieldAlert } from 'lucide-react';
+import { MountainSnow, Sprout, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CitySelect from '@/components/CitySelect';
 import { useCities } from '@/lib/useCities';
 import { useLanguage } from '@/components/LanguageProvider';
+import PageHeader from '@/components/PageHeader';
+import { ErrorPanel, LoadingPanel, EmptyPanel } from '@/components/StatePanel';
 
 export default function SoilPollutionPage() {
   const { cities, loading: citiesLoading } = useCities();
@@ -18,24 +20,18 @@ export default function SoilPollutionPage() {
 
   const fetchData = async (cityName: string) => {
     if (!cityName) return;
-    
+
     setLoading(true);
     setError('');
     setData(null);
 
     try {
       const response = await api.get(`/pollution/soil?city=${encodeURIComponent(cityName)}`);
-      if (response.data.status === 200) {
-        setData(response.data.data);
-      } else {
-        setError(response.data.message || t('errors.fetchError'));
-      }
+      if (response.data.status === 200) setData(response.data.data);
+      else setError(response.data.message || t('errors.fetchError'));
     } catch (err: any) {
-      if (err.response?.status === 404) {
-        setError(t('errors.cityNotFound'));
-      } else {
-        setError(t('errors.fetchError'));
-      }
+      if (err.response?.status === 404) setError(t('errors.cityNotFound'));
+      else setError(t('errors.fetchError'));
     } finally {
       setLoading(false);
     }
@@ -47,104 +43,67 @@ export default function SoilPollutionPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto pb-12">
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 flex items-center tracking-tight mb-4">
-          <MountainSnow className="mr-3 text-amber-500 w-10 h-10" />
-          {t('pollution.soilTitle')}
-        </h1>
-        <p className="text-lg text-muted-foreground">{t('pollution.soilSubtitle')}</p>
-      </motion.div>
+    <div className="page-shell">
+      <PageHeader title={t('pollution.soilTitle')} subtitle={t('pollution.soilSubtitle')} icon={MountainSnow} iconTone="text-amber-500" badge="Soil Module" />
 
-      <CitySelect
-        cities={cities}
-        loading={citiesLoading}
-        value={selectedCity}
-        onChange={handleCityChange}
-        placeholder={t('pollution.soilPlaceholder')}
-        accentColor="primary"
-      />
+      <section className="card space-y-4">
+        <label className="text-sm font-semibold text-foreground">{t('pollution.soilPlaceholder')}</label>
+        <CitySelect cities={cities} loading={citiesLoading} value={selectedCity} onChange={handleCityChange} placeholder={t('pollution.soilPlaceholder')} accentColor="primary" />
+      </section>
 
-      {loading && (
-        <div className="flex justify-center py-12">
-          <svg className="animate-spin h-10 w-10 text-amber-500" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </div>
-      )}
-
-      <AnimatePresence>
-        {error && !loading && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-6 py-4 rounded-xl flex items-center">
-              <AlertCircle className="w-5 h-5 mr-3 shrink-0" />
-              {error}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {loading ? <LoadingPanel message="Analyzing soil degradation…" /> : null}
+      {error && !loading ? <ErrorPanel message={error} /> : null}
+      {!loading && !error && !data && selectedCity ? (
+        <EmptyPanel title="No soil metrics found" description="Choose another city to inspect land and crop impact." />
+      ) : null}
 
       <AnimatePresence>
         {data && !loading && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8"
+            exit={{ opacity: 0, y: -16 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
           >
-            <motion.div className="card border-t-4 border-t-amber-500">
-              <h3 className="text-muted-foreground text-sm font-bold uppercase tracking-widest mb-1">{t('pollution.degradationIndex')}</h3>
-              <div className="text-4xl font-black text-foreground mb-2">{formatNumber(data.degradationIndex)} / {formatNumber(10)}</div>
-              <div className="w-full bg-muted rounded-full h-3 mt-4 overflow-hidden">
-                <motion.div 
+            <div className="card border-t-4 border-t-amber-500">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">{t('pollution.degradationIndex')}</h3>
+              <p className="mt-2 text-4xl font-black">{formatNumber(data.degradationIndex)} / {formatNumber(10)}</p>
+              <div className="mt-4 w-full bg-muted rounded-full h-3 overflow-hidden">
+                <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${(data.degradationIndex / 10) * 100}%` }}
-                  transition={{ duration: 1.5, ease: "easeOut" }}
-                  className="bg-gradient-to-r from-amber-500 to-orange-500 h-3 rounded-full relative"
-                >
-                  <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-                </motion.div>
+                  transition={{ duration: 1.2, ease: 'easeOut' }}
+                  className="h-3 bg-gradient-to-r from-amber-500 to-orange-500"
+                />
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div className="card">
-              <h3 className="text-muted-foreground text-sm font-bold uppercase tracking-widest mb-1 flex items-center">
-                <Sprout className="w-4 h-4 mr-1 text-muted-foreground" /> {t('pollution.cropDamage')}
+            <div className="card">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground flex items-center gap-2">
+                <Sprout className="w-4 h-4" /> {t('pollution.cropDamage')}
               </h3>
-              <div className="text-2xl font-bold text-foreground mt-2">{tApi(data.cropDamageEstimation)}</div>
-            </motion.div>
+              <p className="mt-2 text-2xl font-bold">{tApi(data.cropDamageEstimation)}</p>
+            </div>
 
-            <motion.div className="card">
-              <h3 className="text-muted-foreground text-sm font-bold uppercase tracking-widest mb-1 flex items-center">
-                <ShieldAlert className="w-4 h-4 mr-1 text-muted-foreground" /> {t('pollution.foodContamination')}
+            <div className="card">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4" /> {t('pollution.foodContamination')}
               </h3>
-              <div className={`text-2xl font-bold mt-2 ${
-                data.foodContaminationRisk.includes('High') ? 'text-red-500' :
-                data.foodContaminationRisk.includes('Medium') ? 'text-orange-500' : 'text-emerald-500'
+              <p className={`mt-2 text-2xl font-bold ${
+                data.foodContaminationRisk.includes('High') ? 'text-red-500' : data.foodContaminationRisk.includes('Medium') ? 'text-orange-500' : 'text-emerald-500'
               }`}>
                 {tApi(data.foodContaminationRisk)}
-              </div>
-            </motion.div>
+              </p>
+            </div>
 
-            <motion.div className="card">
-              <h3 className="text-muted-foreground text-sm font-bold uppercase tracking-widest mb-1">{t('pollution.environmentalImpact')}</h3>
-              <div className={`text-2xl font-bold mt-2 ${
-                data.environmentalImpactScore === 'Critical' ? 'text-red-500' :
-                data.environmentalImpactScore === 'Warning' ? 'text-orange-500' : 'text-emerald-500'
+            <div className="card">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">{t('pollution.environmentalImpact')}</h3>
+              <p className={`mt-2 text-2xl font-bold ${
+                data.environmentalImpactScore === 'Critical' ? 'text-red-500' : data.environmentalImpactScore === 'Warning' ? 'text-orange-500' : 'text-emerald-500'
               }`}>
                 {tApi(data.environmentalImpactScore)}
-              </div>
-            </motion.div>
+              </p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
